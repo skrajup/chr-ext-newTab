@@ -63,7 +63,23 @@ const addForm = document.querySelector('.add');//form
 const BMlist = document.querySelector('.BMlist');//ul
 const closeBMform = document.querySelector('#close-BMform');
 const msg = document.querySelector('#msg');
-//Add bokkmark start================================================================
+
+//Attach all bookmarks in localStorage
+attachBMs(localStorage);//load all bookmarks from localStorage all at once
+function attachBMs(localStorage) {
+    for(let i = 0; len = localStorage.length, i < len; i++){
+        const titleOfBM = localStorage.key(i);
+        const urlOfBM = localStorage.getItem(titleOfBM);
+        const Template = `
+            <li class="d-flex justify-content-between">
+                <a class="dropdown-item " href="${urlOfBM}">&#128279; ${titleOfBM} </a>
+                <i class="far fa-trash-alt delete"></i>
+            </li>
+        `;
+        BMlist.innerHTML+=Template;
+    }
+}
+//Add bookmark start================================================================
 function appendTodoHtml(title,url){
     const htmlTemplate = `
             <li class="d-flex justify-content-between">
@@ -83,7 +99,12 @@ addBM.addEventListener('click',e =>{
     const title = addForm.title.value.trim();//trim leading and trailing spaces
     const url = addForm.url.value.trim();//trim leading and trailing spaces
 
+    // localStorage.setItem(title,url);
+    // console.log(Object.entries(localStorage));
+
     if(title.length && url.length){
+        localStorage.setItem(title,url);//add to localStorage
+
         appendTodoHtml(title,url);
         addForm.reset();
 
@@ -112,7 +133,6 @@ closeBMform.addEventListener('click',() => {
 });
 //close-BM form ends here=============================================================
 
-
 //Delete bookmarks on clicking on trash icon==========================================
 //we will use event delegation for deletion,if we don't do this, we will get in trouble 
 //with newly added bookmarks
@@ -123,10 +143,15 @@ BMlist.addEventListener('click',e => {
     //     console.log(e.target.parentElement);
     // }
     if(e.target.classList.contains('delete')){//fine, bcz delete class is specific to trash
+        // Remove from localStorage
+        //just hit trial to get the end of link icon
+        const titleToRemove = e.target.previousElementSibling.textContent.substring(3).trim();
+        localStorage.removeItem(titleToRemove);
+
+        // Also remove from page
         e.target.parentElement.remove();
     }
 
- 
 });
 //Delete bookmarks end====================================================================
 
